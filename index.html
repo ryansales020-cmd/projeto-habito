@@ -42,7 +42,7 @@
             text-align: center;
         }
 
-        /* --- Cabeçalho Superior (Título + Botão de Início) --- */
+        /* --- Cabeçalho Superior (Título + Botões do Topo) --- */
         .app-header {
             display: flex;
             flex-direction: column;
@@ -52,7 +52,15 @@
             padding-top: 10px;
         }
 
-        .start-date-btn {
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .start-date-btn, .profile-link-btn {
             background: var(--surface);
             border: 1px solid rgba(0, 123, 255, 0.3);
             color: var(--text-sub);
@@ -66,17 +74,28 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             transition: all 0.2s ease;
-            margin-bottom: 12px;
+            text-decoration: none;
         }
 
-        .start-date-btn:hover {
+        .start-date-btn:hover, .profile-link-btn:hover {
             border-color: var(--primary);
             color: var(--text-main);
             transform: translateY(-1px);
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
         }
 
         .start-date-btn span {
             color: var(--primary);
+        }
+
+        .profile-link-btn {
+            color: var(--success);
+            border-color: rgba(0, 255, 136, 0.3);
+        }
+
+        .profile-link-btn:hover {
+            border-color: var(--success);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
         }
 
         h1 {
@@ -438,7 +457,7 @@
 
         @media (max-width: 520px) {
             .stats-container {
-                grid-template-columns: repeat(2, 1fr); /* 2 colunas no celular para não espremer */
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -562,11 +581,16 @@
 <body>
 
     <div class="app-container">
-        <!-- Cabeçalho com Botão e Título -->
+        <!-- Cabeçalho com Botões e Título -->
         <div class="app-header">
-            <button class="start-date-btn" id="startDateBtn" title="Alterar data de início">
-                Início: <span id="startDateDisplay">--/--/----</span>
-            </button>
+            <div class="header-actions">
+                <button class="start-date-btn" id="startDateBtn" title="Alterar data de início">
+                    Início: <span id="startDateDisplay">--/--/----</span>
+                </button>
+                <a href="perfil.html" class="profile-link-btn" title="Ver Nível e XP">
+                    ⭐ Nível / XP
+                </a>
+            </div>
             <h1>Habit <span>Tracker</span></h1>
         </div>
 
@@ -932,9 +956,15 @@
 
             const currentKey = formatDateKey(currentDate);
             let dayCompleted = 0;
+            habits.export = habits.forEach(h => {
+                if (h.completedDays && h.completedDays[currentKey]) dayCompleted++;
+            });
+            // Correção rápida para o loop de contagem do dia
+            dayCompleted = 0;
             habits.forEach(h => {
                 if (h.completedDays && h.completedDays[currentKey]) dayCompleted++;
             });
+
             const dayPercent = Math.round((dayCompleted / totalHabits) * 100);
             dayStatEl.textContent = `${dayPercent}%`;
 

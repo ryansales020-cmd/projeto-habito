@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil e Níveis - Habit Tracker</title>
+    <style>
+        :root {
+            --bg-deep: #050508;
+            --surface: #0f1017;
+            --surface-hover: #171822;
+            --border-glow: rgba(0, 123, 255, 0.3);
+            --primary: #007bff;
+            --primary-bright: #3b82f6;
+            --text-main: #ffffff;
+            --text-sub: #8a8f98;
+            --success: #00ff88;
+            --warning: #ffaa00;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 123, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 136, 0.05) 0%, transparent 40%);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        /* --- Cabeçalho --- */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-top: 10px;
+        }
+
+        .back-btn {
+            background: var(--surface);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        h1 {
+            color: var(--text-main);
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(0, 123, 255, 0.4);
+        }
+
+        h1 span {
+            color: var(--success);
+            text-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
+        }
+
+        /* --- Cartão de Status do Jogador --- */
+        .player-card {
+            background: var(--surface);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 24px;
+            padding: 24px 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+        }
+
+        .level-badge {
+            display: inline-block;
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+
+        .player-rank {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .player-xp-text {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            margin-bottom: 20px;
+        }
+
+        .player-xp-text span {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        /* --- Barra de XP --- */
+        .xp-bar-container {
+            width: 100%;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            width: 0%;
+            border-radius: 10px;
+            box-shadow: 0 0 15px var(--success);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- Secção de Todos os Níveis --- */
+        .levels-section {
+            background: var(--surface);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 24px;
+            padding: 24px 20px;
+            text-align: left;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .levels-section h2 {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin-top: 0;
+            margin-bottom: 18px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .level-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .level-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 14px 18px;
+            border-radius: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .level-item.unlocked {
+            background: rgba(0, 255, 136, 0.04);
+            border-color: rgba(0, 255, 136, 0.2);
+        }
+
+        .level-item.current {
+            border-color: var(--success);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.15);
+            background: rgba(0, 255, 136, 0.08);
+        }
+
+        .level-info .lvl-number {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .level-info .lvl-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .level-xp-req {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--success);
+            background: rgba(0, 255, 136, 0.1);
+            padding: 6px 12px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Cabeçalho -->
+        <div class="app-header">
+            <a href="index.html" class="back-btn">&#10094; Voltar</a>
+            <h1>Gamifi<span>cação</span></h1>
+        </div>
+
+        <!-- Cartão de Status do Jogador -->
+        <div class="player-card">
+            <div class="level-badge" id="playerLevelBadge">Nível 1</div>
+            <div class="player-rank" id="playerRankTitle">Novato</div>
+            <div class="player-xp-text" id="playerXpText">XP Total: <span>0 XP</span></div>
+            
+            <div class="xp-bar-container">
+                <div class="xp-bar-fill" id="xpBarFill"></div>
+            </div>
+        </div>
+
+        <!-- Lista de Todos os Níveis -->
+        <div class="levels-section">
+            <h2>Trilha de Patentes</h2>
+            <div class="level-list" id="levelList">
+                <!-- Preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tabela de Patentes e Níveis (Cada nível requer um acumulado de XP)
+        const ranks = [
+            { level: 1, title: "Novato", minXp: 0 },
+            { level: 2, title: "Aprendiz", minXp: 100 },
+            { level: 3, title: "Disciplinado", minXp: 250 },
+            { level: 4, title: "Focado", minXp: 450 },
+            { level: 5, title: "Persistente", minXp: 700 },
+            { level: 6, title: "Guerreiro do Hábito", minXp: 1000 },
+            { level: 7, title: "Mestre da Rotina", minXp: 1400 },
+            { level: 8, title: "Elite Suprema", minXp: 1900 },
+            { level: 9, title: "Lenda Viva", minXp: 2500 }
+        ];
+
+        function calculateTotalXP() {
+            const savedData = localStorage.getItem('myHabitsAppData');
+            if (!savedData) return 0;
+
+            try {
+                const parsed = JSON.parse(savedData);
+                const habits = parsed.habits || [];
+                
+                let totalCompletions = 0;
+                habits.forEach(habit => {
+                    if (habit.completedDays) {
+                        // Conta cada dia que este hábito foi marcado como concluído
+                        Object.values(habit.completedDays).forEach(isCompleted => {
+                            if (isCompleted) totalCompletions++;
+                        });
+                    }
+                });
+
+                // Cada hábito concluído vale 15 XP
+                return totalCompletions * 15;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        function getCurrentLevelData(totalXp) {
+            let currentRank = ranks[0];
+            let nextRank = ranks[1];
+
+            for (let i = 0; i < ranks.length; i++) {
+                if (totalXp >= ranks[i].minXp) {
+                    currentRank = ranks[i];
+                    nextRank = ranks[i + 1] || null;
+                }
+            }
+            return { currentRank, nextRank };
+        }
+
+        function renderGamification() {
+            const totalXp = calculateTotalXP();
+            const { currentRank, nextRank } = getCurrentLevelData(totalXp);
+
+            // Atualizar elementos do cartão do jogador
+            document.getElementById('playerLevelBadge').textContent = `Nível ${currentRank.level}`;
+            document.getElementById('playerRankTitle').textContent = currentRank.title;
+            document.getElementById('playerXpText').innerHTML = `XP Total: <span>${totalXp} XP</span>`;
+
+            // Calcular porcentagem da barra de XP
+            let percentage = 100;
+            if (nextRank) {
+                const xpInCurrentLevel = totalXp - currentRank.minXp;
+                const xpNeededForNext = nextRank.minXp - currentRank.minXp;
+                percentage = Math.min(100, Math.max(0, (xpInCurrentLevel / xpNeededForNext) * 100));
+            }
+            document.getElementById('xpBarFill').style.width = `${percentage}%`;
+
+            // Renderizar lista de todos os níveis
+            const levelListEl = document.getElementById('levelList');
+            levelListEl.innerHTML = '';
+
+            ranks.forEach(rank => {
+                const isUnlocked = totalXp >= rank.minXp;
+                const isCurrent = rank.level === currentRank.level;
+
+                const item = document.createElement('div');
+                item.className = `level-item ${isUnlocked ? 'unlocked' : ''} ${isCurrent ? 'current' : ''}`;
+
+                item.innerHTML = `
+                    <div class="level-info">
+                        <div class="lvl-number">Nível ${rank.level}</div>
+                        <div class="lvl-title">${rank.title}</div>
+                    </div>
+                    <div class="level-xp-req">${rank.minXp} XP</div>
+                `;
+
+                levelListEl.appendChild(item);
+            });
+        }
+
+        // Executar ao carregar a página
+        renderGamification();
+    </script>
+</body>
+</html>
